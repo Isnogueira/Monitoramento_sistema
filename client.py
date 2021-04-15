@@ -34,30 +34,32 @@ def mostrar_info_arquivos_diretorios():
             
     sg.theme(tema)
     
-    layout_arq_dir = [[sg.Text("Informe o nome do arquivo"), sg.InputText(key=("nome_arquivo"))],
-    [sg.Text("Informe o caminho do arquivo"), sg.InputText(key=("caminho_arquivo")), sg.OK()],
+    layout_arq_dir = [[sg.Text("Informe o nome do diretório"), sg.InputText(key=("nome_diretorio"))],
+    [sg.Text("Informe o caminho do diretorio"), sg.InputText(key=("caminho_diretorio")), sg.OK()],
+    [sg.Text("NOME     TAMANHO(kb)      DATA DE CRIAÇÃO       DATA DE MODIFICAÇÃO")],
             [sg.Output(size=(70, 8))]]
     
-    window_arq_dir = sg.Window('Informações sobre arquivos e diretórios', layout_arq_dir)
+    window_arq_dir = sg.Window('Informações sobre arquivos em diretórios', layout_arq_dir)
     
     while True:
         event_arq_dir, values_arq_dir = window_arq_dir.read()
-        nome_arquivo = values_arq_dir["nome_arquivo"]
-        caminho_arquivo = values_arq_dir["caminho_arquivo"]
+        nome_diretorio = values_arq_dir["nome_diretorio"] # 
+        caminho_diretorio = values_arq_dir["caminho_diretorio"] 
         
         if event_arq_dir == "OK":
             try:
-                socket_cliente.send(nome_arquivo.encode("UTF8"))
-                socket_cliente.send(caminho_arquivo.encode("UTF8"))
+                socket_cliente.send(nome_diretorio.encode("UTF8"))
+                socket_cliente.send(caminho_diretorio.encode("UTF8"))
                 bytes = socket_cliente.recv(1024)
-                dados_arq_dir = pickle.loads(bytes)
-                print()
-                print("Arquivo/diretório encontrado...")
-                print()
-                print(f"{str(dados_arq_dir[0])}\n{str(dados_arq_dir[1])}\n{str(dados_arq_dir[2])}")
+                dados_dir = pickle.loads(bytes)
+                for dic in dados_dir:
+                    for i in dic:
+                        print(f"{i}      {dic[i][0]}          {dic[i][1]}       {dic[i][2]}") 
                 break
-            except Exception as erro:
-                print(str(erro))
+            except:
+                for j in dados_dir:
+                    print(j) 
+                break
         
         elif event_arq_dir == sg.WIN_CLOSED or event_arq_dir == 'Exit':
             window_arq_dir.close()
@@ -132,7 +134,7 @@ def mostrar_menu():
     sg.theme(tema)
     
     layout_menu = [[sg.Text('Escolha uma opção para começar...', justification='center')],
-            [sg.Button("CPU e memória"), sg.Button('Arquivos e Diretórios')],
+            [sg.Button("CPU e memória"), sg.Button('Arquivos em diretórios')],
             [sg.Button("Processos"), sg.Button("Scanner de rede")]]
     
     window_menu = sg.Window('Monitoramento de sistema', layout_menu)
@@ -145,7 +147,7 @@ def mostrar_menu():
                 socket_cliente.send(event_menu.encode("UTF-8")) 
                 mostrar_info_cpu_memoria()
                 
-            elif (event_menu == "Arquivos e Diretórios"):
+            elif (event_menu == "Arquivos em diretórios"):
                 socket_cliente.send(event_menu.encode("UTF-8")) 
                 mostrar_info_arquivos_diretorios()
 

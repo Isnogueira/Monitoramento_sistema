@@ -13,7 +13,6 @@ def dados_cpu():
     
     return resp_cpu
 
-
 def dados_memoria_ram():
     
     mem = psutil.virtual_memory()
@@ -49,24 +48,32 @@ def dados_cpu_memoria():
     
     return resposta
 
-
 def dados_arquivos_diretorios(cliente):
     
-    nome_arquivo = cliente.recv(1024).decode("UTF-8")
-    caminho_arquivo = cliente.recv(1024).decode("UTF-8")
-    
+    nome_diretorio = cliente.recv(1024).decode("UTF-8") 
+    caminho_diretorio = cliente.recv(1024).decode("UTF-8")
     resposta = []
-    arq_dir = os.listdir(".")
-    try:
-        for i in arq_dir:
-            if i == nome_arquivo:
-                status = os.stat(caminho_arquivo)
-                resposta.append(f"Tamanho: {round((status.st_size/1000), 2)} MB")
-                resposta.append(f"Data de Criação: {time.ctime(status.st_atime)}")
-                resposta.append(f"Data de Modificação: {time.ctime(status.st_mtime)}")
-                return resposta          
-    except Exception as erro:
-        print(str(erro))
+    
+    n = os.path.split(caminho_diretorio) 
+    if nome_diretorio == n[1]: 
+        lista_dir = os.listdir(caminho_diretorio)
+        try:
+            for i in lista_dir:
+                c = os.path.join(caminho_diretorio, i)
+                if os.path.isfile(c):
+                    dic = {} 
+                    dic[i] = []
+                    status = os.stat(c)
+                    dic[i].append(status.st_size/1000) 
+                    dic[i].append(time.ctime(status.st_atime))
+                    dic[i].append(time.ctime(status.st_mtime))
+                    resposta.append(dic)
+            return resposta
+        except Exception as erro:
+            print(str(erro))
+    else:
+        resposta.append("O diretório não existe!") 
+        return resposta
 
 def dados_processos(cliente):
     
@@ -81,7 +88,6 @@ def dados_processos(cliente):
             resposta.append(f"Porcentagem de memória consumida: {round(proc.memory_percent(), 2)}%")
             resposta.append(f"Porcentagem de CPU consumido: {proc.cpu_percent()}%")
             return resposta
-
 
 def dados_scanner_rede(cliente):
     
@@ -99,7 +105,6 @@ def dados_scanner_rede(cliente):
         return resposta
     except Exception as erro:
         print(str(erro))
-
 
 def conexao_cliente():
     
@@ -122,7 +127,7 @@ def conexao_cliente():
             bytes = pickle.dumps(resposta)
             cliente.send(bytes)
             
-        elif event.decode("UTF-8") == "Arquivos e Diretórios":
+        elif event.decode("UTF-8") == "Arquivos em diretórios":
             resposta = dados_arquivos_diretorios(cliente)
             bytes = pickle.dumps(resposta)
             cliente.send(bytes)
