@@ -17,9 +17,9 @@
 
 * **CPU :** Retorna o nome, modelo, arquitetura, palavra e núcleos.  
 * **ARMAZENAMENTO :** Retorna o espaço total, livre e ocupado da memória RAM e do Disco Rígido.  
-* **ARQUIVOS E DIRETÓRIOS :** 
-  * Realiza uma busca através do nome e do caminho do arquivo/diretório informados pelo usuário.
-  * Retorna seu tamanho, data de criação e data de modificação.
+* **ARQUIVOS EM UM DETERMINADO DIRETÓRIO :** 
+  * Realiza uma busca em um diretório informado pelo usuário (nome e caminho do diretório) .
+  * Retorna a lista de arquivos presentes nesse diretório contendo o nome do arquivo, tamanho, data de criação e data de modificação.
 * **PROCESSOS :**
   * Realiza uma busca através do PID do processo informado pelo usuário.
   * Retorna seu nome, executável, memória consumida e CPU consumido.  
@@ -46,12 +46,13 @@
 
 * `mostrar_info_arquivos_diretorios()`
 
-  1. Define o layout da janela de arquivos/diretórios através de uma lista contendooutras listas. Uma lista com um texto de solicitação e um input de usuário para requerer o nome do arquivo, outra lista com um texto de solicitação, um input de usuário para requerer o caminho do arquivo e um botão OK e mais uma definindo uma tela de output.
+  1. Define o layout da janela de arquivos/diretórios através de uma lista contendo outras listas. Uma lista com um texto de solicitação e um input de usuário para requerer o nome do diretório alvo da busca, uma lista com um texto de solicitação, um input de usuário para requerer o caminho do arquivo e um botão OK, uma lista definindo o titulo da tabela de arquivo e uma lista definindo uma tela de output.
   2. Define a janela setando o título e o layout
   3. Itera a leitura dos eventos e dos valores da janela e seta os inputs de usuário
   em variáveis como valores
   4. Envia os inputs para o servidor, recebe a lista de resposta e printa no output os dados acessados pelo índice da lista de resposta quando disparado o evento do
   botão OK
+  5. Se o evento OK mostrar alguma exceção, o programa mostrará apenas uma mensagem de erro "O diretório não existe"
   
 * `mostrar_info_processos()`
 
@@ -120,13 +121,20 @@
 
 * `dados_arquivos_diretorios(PARAM: cliente - conexão com o cliente)`
 
-  1. Recebe o nome do arquivo/diretório
-  2. Recebe o caminho do arquivo/diretório
+  1. Recebe o nome do diretório alvo
+  2. Recebe o caminho do diretório alvo
   3. Define a lista de resposta vazia
-  4. Coleta os arquivos/diretórios da pasta corrente com o os.listdir(“.”)
-  5. Percorre a lista de arquivos/diretórios e coleta suas informações com o os.stat() colocando o caminho como parâmetro
-  6. Se o nome do arquivo/diretório da lista for igual ao nome recebido, adiciona o tamanho, a data de criação e a data de modificação do arquivo/diretório na lista de resposta
-  7. Retorna a lista de resposta
+  4. Coleta os arquivos do diretório alvo com o os.listdir()
+  5. Serpara o nome do diretório com o os.path.split() 
+  6. Se o nome do diretório for igual ao nome recebido, coleta a lista de arquivos presentes no diretório
+  7. Percorre a lista de arquivos concatenando o caminho do diretório alvo com o nome de cada arquivo com os.path.join()
+  8. Valida se o arquivo realmente é um arquivo
+  9. Cria um dicionário com o nome de cada arquivo como indice
+  10. Seta com uma lista vazia no dicionário
+  11. Adiciona a lista vazia as informações do arquivo coletadas com o os.stat() 
+  12. Adiciona o dicionário completo a lista de resposta
+  13. Retorna a lista de resposta
+  14. Se o nome do diretório não for o mesmo que o o nome informado, uma mensagem de erro será adicionada a lista de resposta.
 
 * `dados_processos(PARAM: cliente - conexão com o cliente)`
 
@@ -153,11 +161,11 @@
 
 ## Imagens das telas de execução
 
-![menu](https://user-images.githubusercontent.com/62779108/114598527-616d0a80-9c68-11eb-9f78-e96960023da9.png)
+![menu-2](https://user-images.githubusercontent.com/62779108/114935860-10007f00-9e12-11eb-9763-1f0e792e97b1.png)
 
 ![cpu_memoria](https://user-images.githubusercontent.com/62779108/114598551-6a5ddc00-9c68-11eb-8e06-b3ad03f9430f.png)
 
-![arquivos-diretorios](https://user-images.githubusercontent.com/62779108/114598594-73e74400-9c68-11eb-9113-293a2328eec2.png)
+![arquivos-diretorios-2](https://user-images.githubusercontent.com/62779108/114935808-0414bd00-9e12-11eb-8223-58c0280952c2.png)
 
 ![processo](https://user-images.githubusercontent.com/62779108/114598613-79dd2500-9c68-11eb-96ab-8bd02edb8c3b.png)
 
